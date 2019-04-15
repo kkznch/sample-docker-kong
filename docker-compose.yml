@@ -1,0 +1,23 @@
+version: '3.2'
+services:
+  postgres:
+    build:
+      context: ./postgres
+  kong:
+    build:
+      context: ./kong
+    depends_on:
+      - postgres
+    entrypoint:
+      - dockerize
+      - -timeout
+      - 60s
+      - -wait
+      - tcp://postgres:5432
+    command: ash -c "kong migrations bootstrap && kong start"
+    expose:
+      - "8000"
+      - "8001"
+    ports:
+      - "8000:8000"
+      - "8001:8001"
